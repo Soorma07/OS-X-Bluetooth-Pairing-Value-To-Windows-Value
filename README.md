@@ -20,7 +20,7 @@ I have copied and slightly modified his steps here for you.
 1. Pair device with Windows, then go back in and pair in OS X.
 2. a. After you have completed both pairings in step 1, then execute this script or run the application
 2. b. Get the link key from OS X and email it to yourself or put it somewhere you can reach from Windows.
-[code]sudo defaults read /private/var/root/Library/Preferences/blued.plist[/code]
+[code]sudo defaults read /private/var/root/Library/Preferences/com.apple.bluetoothd.plist[/code]
 3. a. If you don't have psexec, Google for it and download it.
 3.  b. Boot Windows, open cmd as admin, [code]psexec -s -i regedit[/code]
 4. Navigate to HKLM\System\CurrentControlSet\services\BTHPORT\Parameters\Keys\ (BT ID of Mouse/Keyboard) and begin modify binary data
