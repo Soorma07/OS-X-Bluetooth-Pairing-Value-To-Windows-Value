@@ -56,7 +56,7 @@ I have copied and slightly modified his steps here for you.
 1. Pair device with Windows, then go back and pair in OS X.
 2. a. After you have completed both pairings in step 1, then execute this script or run the application
 2. b. Get the link keys and values from executing this script and email it to yourself or put it somewhere you can reach from Windows.
-[code]sudo defaults read /private/var/root/Library/Preferences/blued.plist[/code]
+[code]sudo defaults read /private/var/root/Library/Preferences/com.apple.bluetoothd.plist[/code]
 3. a. If you don't have psexec, Google for it and download it.
 3. b. Boot Windows, open cmd as admin, [code]psexec -s -i regedit[/code]
 4. Navigate to HKLM\\System\\CurrentControlSet\\services\\BTHPORT\\Parameters\\Keys\\ (BT ID of Mouse/Keyboard) and begin modifying the binary data to the Windows pairing value as output by this script.
@@ -74,7 +74,7 @@ set myPassword to text returned of ¬
 		with icon stop ¬
 		default answer ¬
 		"" with hidden answer)
-set linkKeys to do shell script "sudo defaults read /private/var/root/Library/Preferences/blued.plist | awk '/LinkKeys/,/};/'" user name userName password myPassword with administrator privileges
+set linkKeys to do shell script "sudo defaults read /private/var/root/Library/Preferences/com.apple.bluetoothd.plist | awk '/LinkKeys/,/};/'" user name userName password myPassword with administrator privileges
 set carriageReturnCharacter to (ASCII character 13) --// CR
 set the text item delimiters to carriageReturnCharacter
 set listOfDelimitedLinkKeys to text items of linkKeys
