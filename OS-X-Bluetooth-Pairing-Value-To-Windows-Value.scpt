@@ -17,6 +17,7 @@
 -- 2. a. After you have completed both pairings in step 1, then execute this script or run the application
 -- 2. b. Get the link key from OS X and email it to yourself or put it somewhere you can reach from Windows.
 -- [code]sudo defaults read /private/var/root/Library/Preferences/blued.plist[/code]
+-- [code]sudo defaults read /private/var/root/Library/Preferences/com.apple.Bluetoothd.plist[/code]
 -- 3. a. If you don't have psexec, Google for it and download it.
 -- 3.  b. Boot Windows, open cmd as admin, [code]psexec -s -i regedit[/code]
 -- 4. Navigate to HKLM\System\CurrentControlSet\services\BTHPORT\Parameters\Keys\ (BT ID of Mouse/Keyboard) and begin modify binary data
@@ -56,7 +57,8 @@ I have copied and slightly modified his steps here for you.
 1. Pair device with Windows, then go back and pair in OS X.
 2. a. After you have completed both pairings in step 1, then execute this script or run the application
 2. b. Get the link keys and values from executing this script and email it to yourself or put it somewhere you can reach from Windows.
-[code]sudo defaults read /private/var/root/Library/Preferences/com.apple.bluetoothd.plist[/code]
+[code]sudo defaults read /private/var/root/Library/Preferences/blued.plist[/code]
+[code]sudo defaults read /private/var/root/Library/Preferences/com.apple.Bluetoothd.plist[/code]
 3. a. If you don't have psexec, Google for it and download it.
 3. b. Boot Windows, open cmd as admin, [code]psexec -s -i regedit[/code]
 4. Navigate to HKLM\\System\\CurrentControlSet\\services\\BTHPORT\\Parameters\\Keys\\ (BT ID of Mouse/Keyboard) and begin modifying the binary data to the Windows pairing value as output by this script.
@@ -67,62 +69,81 @@ Twitter: @Soorma07
 "
 display dialog quoted form of helpText
 
-set userName to do shell script "whoami"
-set myPassword to text returned of ¬
-	(display dialog "Enter password for " & ¬
-		quoted form of userName ¬
-		with icon stop ¬
-		default answer ¬
-		"" with hidden answer)
-set linkKeys to do shell script "sudo defaults read /private/var/root/Library/Preferences/com.apple.bluetoothd.plist | awk '/LinkKeys/,/};/'" user name userName password myPassword with administrator privileges
-set carriageReturnCharacter to (ASCII character 13) --// CR
-set the text item delimiters to carriageReturnCharacter
-set listOfDelimitedLinkKeys to text items of linkKeys
-set bluetoothAdapterAddressLine to item 2 of listOfDelimitedLinkKeys
-set listOfLinkKeys to items 3 thru -2 of listOfDelimitedLinkKeys
+set bluetoothLinkKeysPListValue to "blued.plist"
+set alternativeBluetoothLinkKeysPListVlaue to "com.apple.Bluetoothd.plist"
+set notWorkingBluetoothLinkKeysPListValue to "com.apple.Bluetooth.plist"
 
-set bluetoothAdapterAddressKey to bluetoothAdapterAddressLine
-set the text item delimiters to "\""
-set bluetoothAdapterAddress to text item 2 of bluetoothAdapterAddressKey
+set shellCommand to "sudo defaults read /private/var/root/Library/Preferences/" & bluetoothLinkKeysPListValue & " | awk '/LinkKeys/,/};/'"
 
-set output to ("Your Bluetooth Adapter Address is: " & bluetoothAdapterAddress)
-set output to output & carriageReturnCharacter
-set output to output & carriageReturnCharacter
-
-set counter to 1
-
-repeat with currentLinkKeyValuePair in listOfLinkKeys
-	set the text item delimiters to "\""
-	set currentLinkKey to text item 2 of currentLinkKeyValuePair
-	
-	set the text item delimiters to "<"
-	set currentLinkValue to text item 2 of currentLinkKeyValuePair
-	set the text item delimiters to ">"
-	set currentLinkValue to text item 1 of currentLinkValue
-	
-	set output to output & ("Bluetooth device " & counter & " pairing key                                            : " & currentLinkKey)
-	set output to output & carriageReturnCharacter
-	
-	set output to output & ("Bluetooth device " & counter & " pairing current value in OS X                  : " & currentLinkValue)
-	set output to output & carriageReturnCharacter
-	
-	-- Need to manipulate currentLinkValue here to Windows format
-	
-	set currentLinkValue to removeSpaces(currentLinkValue)
-	set currentLinkValue to reverseEndian(currentLinkValue)
-	
-	set output to output & ("Bluetooth device " & counter & " pairing value in Windows should be set to: " & currentLinkValue)
-	set output to output & carriageReturnCharacter
-	
-	set output to output & carriageReturnCharacter
-	
-	set counter to counter + 1
-end repeat
-
-display dialog quoted form of output
-do shell script "echo " & quoted form of helpText & carriageReturnCharacter & carriageReturnCharacter & quoted form of output
-
+try
+	getLinkKeys(shellCommand, helpText)
+on error errorMessage
+	try
+		set shellCommand to "sudo defaults read /private/var/root/Library/Preferences/" & alternativeBluetoothLinkKeysPListVlaue & " | awk '/LinkKeys/,/};/'"
+		getLinkKeys(shellCommand, helpText)
+	on error errorMessage
+		display dialog "Error: " & errorMessage
+	end try
+end try
 -- #endregion Main
+
+on getLinkKeys(shellCommand, helpText)
+	set userName to do shell script "whoami"
+	set myPassword to text returned of ¬
+		(display dialog "Enter password for " & ¬
+			quoted form of userName ¬
+			with icon stop ¬
+			default answer ¬
+			"" with hidden answer)
+	
+	set linkKeys to do shell script shellCommand user name userName password myPassword with administrator privileges
+	set carriageReturnCharacter to (ASCII character 13) --// CR
+	set the text item delimiters to carriageReturnCharacter
+	set listOfDelimitedLinkKeys to text items of linkKeys
+	set bluetoothAdapterAddressLine to item 2 of listOfDelimitedLinkKeys
+	set listOfLinkKeys to items 3 thru -2 of listOfDelimitedLinkKeys
+	
+	set bluetoothAdapterAddressKey to bluetoothAdapterAddressLine
+	set the text item delimiters to "\""
+	set bluetoothAdapterAddress to text item 2 of bluetoothAdapterAddressKey
+	set output to ("Your Bluetooth Adapter Address is: " & bluetoothAdapterAddress)
+	set output to output & carriageReturnCharacter
+	set output to output & carriageReturnCharacter
+	
+	set counter to 1
+	
+	repeat with currentLinkKeyValuePair in listOfLinkKeys
+		set the text item delimiters to "\""
+		set currentLinkKey to text item 2 of currentLinkKeyValuePair
+		
+		set the text item delimiters to "<"
+		set currentLinkValue to text item 2 of currentLinkKeyValuePair
+		set the text item delimiters to ">"
+		set currentLinkValue to text item 1 of currentLinkValue
+		
+		set output to output & ("Bluetooth device " & counter & " pairing key                                            : " & currentLinkKey)
+		set output to output & carriageReturnCharacter
+		
+		set output to output & ("Bluetooth device " & counter & " pairing current value in OS X                  : " & currentLinkValue)
+		set output to output & carriageReturnCharacter
+		
+		-- Need to manipulate currentLinkValue here to Windows format
+		
+		set currentLinkValue to removeSpaces(currentLinkValue)
+		set currentLinkValue to reverseEndian(currentLinkValue)
+		
+		set output to output & ("Bluetooth device " & counter & " pairing value in Windows should be set to: " & currentLinkValue)
+		set output to output & carriageReturnCharacter
+		
+		set output to output & carriageReturnCharacter
+		
+		set counter to counter + 1
+	end repeat
+	
+	display dialog quoted form of output
+	do shell script "echo " & quoted form of helpText & carriageReturnCharacter & carriageReturnCharacter & quoted form of output
+	
+end getLinkKeys
 
 on removeSpaces(toRemoveSpaces)
 	set toRemoveSpacesOriginal to toRemoveSpaces
