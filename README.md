@@ -17,12 +17,20 @@ for doing the leg work and figuring out the algorithm
 You must follow pacnow's steps to edit the value in Windows.
 I have copied and slightly modified his steps here for you.
 
-1. Pair device with Windows, then go back in and pair in OS X.
-2. a. After you have completed both pairings in step 1, then execute this script or run the application
-2. b. Get the link key from OS X and email it to yourself or put it somewhere you can reach from Windows.
-[code]sudo defaults read /private/var/root/Library/Preferences/com.apple.bluetoothd.plist[/code]
+- [ ] pair device with windows
+- [ ] reboot and pair with OS X
+- [ ] run this script/app
+- [ ] save the link key/s somewhere you can reach from windows
+- [ ] boot to windows 
+- [ ] run regedit with admin rights
+- [ ] go to HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BTHPORT\Parameters\Keys\BD_ADDR
+- [ ] edit the key of the device
+
+`sudo defaults read /private/var/root/Library/Preferences/com.apple.bluetoothd.plist`
+`sudo defaults read /private/var/root/Library/Preferences/blued.plist`
 3. a. If you don't have psexec, Google for it and download it.
-3.  b. Boot Windows, open cmd as admin, [code]psexec -s -i regedit[/code]
+3.  b. Boot Windows, open cmd as admin
+`psexec -s -i regedit`
 4. Navigate to HKLM\System\CurrentControlSet\services\BTHPORT\Parameters\Keys\ (BT ID of Mouse/Keyboard) and begin modify binary data
 
 Here's an example link key, instead of just pluggin that in, what you want to do is break it apart starting from the right, working two digits at a time in pairs.
