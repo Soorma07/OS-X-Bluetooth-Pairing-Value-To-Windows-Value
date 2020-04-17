@@ -5,41 +5,49 @@ A useful script to simultaneously pair a bluetooth device to your Mac in OS X an
 
 
 OS X Bluetooth Pairing Value To Windows Value
-A script to get the Windows equivalent bluetooth pairing key/value pair (little endian?)
+A script to get the Windows equivalent bluetooth adress/link key pair (little endian?)
 This is useful if you would like to pair a bluetooth device to both OS X and Windows (in BootCamp).
 
-How it works:
-The AppleScript parses the paired bluetooth devices' link key/value pairs and prints out the Windows equivalent value (little endian?).
-
-Thanks to user pacnow (Camoguy) at https://discussions.apple.com/thread/3113227?start=0&tstart=0 
+Thanks to user pacnow (Camoguy) at [discussions.apple.com](https://discussions.apple.com/thread/3113227)
 for doing the leg work and figuring out the algorithm
 
-You must follow pacnow's steps to edit the value in Windows.
-I have copied and slightly modified his steps here for you.
+Follow these steps to get your bluetooth device working.
 
-- [ ] pair device with windows
-- [ ] reboot and pair with OS X
-- [ ] run this script/app
-- [ ] save the link key/s somewhere you can reach from windows
-- [ ] boot to windows 
-- [ ] run regedit with admin rights
-- [ ] go to HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BTHPORT\Parameters\Keys\BD_ADDR
-- [ ] edit the key of the device
+-  pair device with windows
+-  reboot and pair with OS X
+-  run this script/app
+-  save the link key/s somewhere you can reach from windows
+-  boot to windows
+-  run regedit with admin rights
+-  go to HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BTHPORT\Parameters\Keys\BD_ADDR
+-  edit the key of the device
+-  reboot
 
-`sudo defaults read /private/var/root/Library/Preferences/com.apple.bluetoothd.plist`
-`sudo defaults read /private/var/root/Library/Preferences/blued.plist`
-3. a. If you don't have psexec, Google for it and download it.
-3.  b. Boot Windows, open cmd as admin
-`psexec -s -i regedit`
-4. Navigate to HKLM\System\CurrentControlSet\services\BTHPORT\Parameters\Keys\ (BT ID of Mouse/Keyboard) and begin modify binary data
+### What this script does
 
-Here's an example link key, instead of just pluggin that in, what you want to do is break it apart starting from the right, working two digits at a time in pairs.
+- read the link keys
+```
+up to Sierra:
+sudo defaults read /private/var/root/Library/Preferences/blued.plist LinkKeys
+High Sierra and onwards:
+sudo defaults read /private/var/root/Library/Preferences/com.apple.bluetoothd.plist LinkKeys
+````
+- parse the data with awk
+- display it in a window
+- export a bluetooth.reg file with all paired link keys, if desired
 
-98542ff9 88e19449 475250e1 3943255b ( What is shown in OS X)
-5B254339 E1505247 4994E188 F92F5498 (What you enter in Windows)
+Here's an example link key. Instead of just typing that in you want to break it apart starting from the right, taking a pair of two characters at a time.
+
+`98 54 2f f9 88 e1 94 49 47 52 50 e1 39 43 25 5b` (What is shown in OS X)
+`5B 25 43 39 E1 50 52 47 49 94 E1 88 F9 2F 54 98` (What you enter in Windows)
+
  -Help from Camoguy-
 
-Note, this script requires administrator privileges. I am strictly just using your password here within the script to get the bluetooth pairing values. If you are still wary, and prefer not to enter your password into an unknown script, then comment out and edit the password related lines below and just open a terminal window and perform a sudo command before running this script.
+Note, this script requires administrator privileges.
+Your password is not saved anywhere and only known to you and your OS.
 
 - Adnaan Soorma
 - Twitter: @Soorma07
+
+- broeckelmaier
+- Twitter: @broeckelmaier
