@@ -54,8 +54,8 @@ Your password is not saved anywhere and only known to you and your OS.
 - broeckelmaier
 - Twitter: @broeckelmaier
 
-### Possible Issues:
-## Windows /keys in registry is empty #8
+## Possible Issues:
+### Windows /keys in registry is empty #8
 
 shivangswain commented on Aug 23, 2020
 You can fix that by setting the permissions of the /Keys folder/key. So,
