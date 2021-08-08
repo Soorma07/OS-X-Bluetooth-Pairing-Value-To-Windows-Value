@@ -71,3 +71,7 @@ So,
 - select the "Full Control" checkbox
 - press OK
 - Now you'll be able to add and see the keys. Remember to reboot before testing.
+
+### Where is the reg file saved to? #7
+
+It should save directly to the same folder where the script is run from.
